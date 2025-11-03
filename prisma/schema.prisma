@@ -1,0 +1,157 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  USER
+}
+
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+  RESERVED
+  MAINTENANCE
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String
+  email         String       @unique
+  password      String
+  role          Role         @default(USER)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  borrowedBooks Borrowing[]  @relation("BorrowedBooks")
+  reservations  Reservation[] @relation("UserReservations")
+  fines         Fine[]       @relation("UserFines")
+  notifications Notification[] @relation("UserNotifications")
+}
+
+model Book {
+  id            String       @id @default(cuid())
+  title         String
+  author        String
+  isbn          String?      @unique
+  description   String?
+  publishedYear Int?
+  publisher     String?
+  pageCount     Int?
+  language      String?
+  fileUrl       String
+  coverImageUrl String?
+  status        BookStatus   @default(AVAILABLE)
+  category      String?
+  addedBy       User?        @relation("UploadedBooks", fields: [addedById], references: [id])
+  addedById     String?
+  createdAt     DateTime     @default(now())
+  borrowings    Borrowing[]  @relation("BookBorrowings")
+  reservations  Reservation[] @relation("BookReservations")
+  
+  @@index([title])
+  @@index([author])
+}
+
+model Borrowing {
+  id          String   @id @default(cuid())
+  book        Book     @relation("BookBorrowings", fields: [bookId], references: [id])
+  bookId      String
+  user        User     @relation("BorrowedBooks", fields: [userId], references: [id])
+  userId      String
+  borrowedAt  DateTime @default(now())
+  dueDate     DateTime
+  returnedAt  DateTime?
+  fine        Float    @default(0)
+  status      BorrowingStatus @default(BORROWED)
+  
+  @@index([userId])
+  @@index([bookId])
+}
+
+enum BorrowingStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+  LOST
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  book        Book     @relation("BookReservations", fields: [bookId], references: [id])
+  bookId      String
+  user        User     @relation("UserReservations", fields: [userId], references: [id])
+  userId      String
+  reservedAt  DateTime @default(now())
+  expiresAt   DateTime
+  status      ReservationStatus @default(PENDING)
+  
+  @@index([userId])
+  @@index([bookId])
+}
+
+enum ReservationStatus {
+  PENDING
+  FULFILLED
+  CANCELLED
+  EXPIRED
+}
+
+model Fine {
+  id          String   @id @default(cuid())
+  user        User     @relation("UserFines", fields: [userId], references: [id])
+  userId      String
+  amount      Float
+  reason      String
+  status      FineStatus @default(UNPAID)
+  paidAt      DateTime?
+  borrowing   Borrowing? @relation(fields: [borrowingId], references: [id])
+  borrowingId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum FineStatus {
+  UNPAID
+  PAID
+  WAIVED
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  user      User     @relation("UserNotifications", fields: [userId], references: [id])
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      NotificationType
+  link      String?
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+}
+
+enum NotificationType {
+  DUE_SOON
+  OVERDUE
+  RESERVATION_AVAILABLE
+  FINE_ISSUED
+  SYSTEM
+}
+
+model SystemSettings {
+  id               String  @id @default(cuid())
+  maxBorrowDays    Int     @default(14)
+  maxRenewals      Int     @default(1)
+  finePerDay       Float   @default(0.5)
+  maxBooksPerUser  Int     @default(5)
+  reservationExpiryDays Int @default(3)
+  maintenanceMode  Boolean @default(false)
+  updatedAt        DateTime @updatedAt
+}
+
