@@ -34,7 +34,7 @@ export async function GET(_req, { params }) {
 
     const book = await prisma.book.findUnique({
       where: { id },
-      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, createdAt: true },
+      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, createdAt: true, quantity: true },
     });
     if (!book) return json({ error: "Not found" }, { status: 404 });
     return json(book);

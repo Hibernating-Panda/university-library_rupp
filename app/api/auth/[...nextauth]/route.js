@@ -13,40 +13,73 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
         if (!user) return null;
+
         const ok = await verifyPassword(credentials.password, user.password);
         if (!ok) return null;
-        // Promote specific email to ADMIN if not already
+
+        // Promote a specific user to ADMIN if necessary
         const emailLc = user.email.toLowerCase();
         if (emailLc === "sengsengly3@gmail.com" && user.role !== "ADMIN") {
-          const updated = await prisma.user.update({ where: { id: user.id }, data: { role: "ADMIN" } });
-          return { id: updated.id, name: updated.name, email: updated.email, role: updated.role };
+          const updated = await prisma.user.update({
+            where: { id: user.id },
+            data: { role: "ADMIN" },
+          });
+          return {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            role: updated.role,
+          };
         }
-        return { id: user.id, name: user.name, email: user.email, role: user.role };
+
+        // ✅ Return all needed fields (including id)
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
       },
     }),
   ],
+
   secret: process.env.NEXTAUTH_SECRET,
+
   callbacks: {
     async jwt({ token, user }) {
-      // If signing in, persist role from user
-      if (user?.role) {
+      // ✅ When user logs in, attach id + role to token
+      if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
-      // Always refresh role from DB by email if available (covers OAuth sessions)
-      if (!token.role && token?.email) {
-        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
-        if (dbUser) token.role = dbUser.role;
+
+      // Refresh role/id from DB if token only exists
+      if (!token.role || !token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+        }
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id;      // ✅ always available now
         session.user.role = token.role;
       }
       return session;
     },
+
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;

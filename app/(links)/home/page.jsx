@@ -10,7 +10,7 @@ export default async function Home() {
   const books = await prisma.book.findMany({
     select: {
       id: true,
-      title: true, 
+      title: true,
       author: true,
       coverImageUrl: true,
       quantity: true,

@@ -36,7 +36,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "app/api/upload.js"
-  ],
+, "app/(links)/home/page.jsx", "app/components/BookGrid.jsx"  ],
   "exclude": [
     "node_modules"
   ]

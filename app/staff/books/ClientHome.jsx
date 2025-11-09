@@ -1,0 +1,140 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+export default function StaffBookManager({ user, initialBooks }) {
+  const [query, setQuery] = useState("");
+  const [books, setBooks] = useState(initialBooks || []);
+  const [deletingId, setDeletingId] = useState("");
+  const router = useRouter();
+
+  // ✅ Search filter
+  const filteredBooks = useMemo(() => {
+    const q = query.toLowerCase();
+    return books.filter(
+      (book) =>
+        book.title.toLowerCase().includes(q) ||
+        book.author.toLowerCase().includes(q) ||
+        (book.category || "").toLowerCase().includes(q)
+    );
+  }, [query, books]);
+
+  // ❌ Delete a book
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this book? This cannot be undone.")) return;
+
+    try {
+      setDeletingId(id);
+      const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) throw new Error(data?.error || data?.message || "Failed to delete");
+      setBooks((prev) => prev.filter((b) => b.id !== id));
+    } catch (e) {
+      alert(e?.message || "Failed to delete");
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full grid grid-cols-12 pr-5 bg-[#F3F3F7] absolute">
+      {/* 🔍 Search box */}
+      <div className="fixed top-8 left-70 w-full z-50 flex justify-start">
+        <div className="ml-5 mt-3 w-1/4">
+          <div className="flex items-center w-full bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="flex justify-between w-full px-4 py-2 text-[#F76B56]">
+              <input
+                type="text"
+                placeholder="Search"
+                className="outline-none text-gray-700 w-full"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 17 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15.2375 16.5792L9.87083 11.2125C9.39167 11.5958 8.84062 11.8993 8.21771 12.1229C7.59479 12.3465 6.93194 12.4583 6.22917 12.4583C4.48819 12.4583 3.01492 11.8555 1.80933 10.65C0.603111 9.44374 0 7.97014 0 6.22917C0 4.48819 0.603111 3.0146 1.80933 1.80838C3.01492 0.602792 4.48819 0 6.22917 0C7.97014 0 9.44374 0.602792 10.65 1.80838C11.8555 3.0146 12.4583 4.48819 12.4583 6.22917C12.4583 6.93194 12.3465 7.59479 12.1229 8.21771C11.8993 8.84062 11.5958 9.39167 11.2125 9.87083L16.6031 15.2615C16.7788 15.4372 16.8667 15.6528 16.8667 15.9083C16.8667 16.1639 16.7708 16.3875 16.5792 16.5792C16.4035 16.7549 16.1799 16.8427 15.9083 16.8427C15.6368 16.8427 15.4132 16.7549 15.2375 16.5792ZM6.22917 10.5417C7.42708 10.5417 8.44547 10.1226 9.28433 9.28433C10.1226 8.44547 10.5417 7.42708 10.5417 6.22917C10.5417 5.03125 10.1226 4.01286 9.28433 3.174C8.44547 2.33578 7.42708 1.91667 6.22917 1.91667C5.03125 1.91667 4.01286 2.33578 3.174 3.174C2.33578 4.01286 1.91667 5.03125 1.91667 6.22917C1.91667 7.42708 2.33578 8.44547 3.174 9.28433C4.01286 10.1226 5.03125 10.5417 6.22917 10.5417Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 📚 Book Table */}
+      <div className="flex-1 col-start-3 col-span-10 mt-20 px-6 py-4 z-20 bg-[#F3F3F7]">
+        <main>
+          <div className="grid grid-cols-5 px-6 py-2 text-[#4D4D4D] font-semibold text-lg text-center">
+            <p className="text-left">Title</p>
+            <p></p>
+            <p>Category</p>
+            <p>Quantity</p>
+            <p>Actions</p>
+          </div>
+
+          <div className="px-6 text-black">
+            {filteredBooks.length === 0 ? (
+              <div className="col-span-4 text-center text-gray-500 py-10">
+                No books found.
+              </div>
+            ) : (
+              filteredBooks.map((book) => (
+                <div
+                  key={book.id}
+                  className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-5 items-center"
+                >
+                  <img
+                    src={book.coverImageUrl || `/api/books/${book.id}/cover`}
+                    alt={book.title}
+                    className="min-w-16 max-w-16 h-auto object-contain rounded"
+                  />
+                  <div className="text-top">
+                    <h2 className="font-semibold mt-2 text-lg">{book.title}</h2>
+                    <p className="text-sm text-gray-600">{book.author}</p>
+                  </div>
+                  <p className="text-sm text-gray-600 text-center">
+                    {book.category || "Null"}
+                  </p>
+                  <p className="text-sm text-gray-600 text-center">
+                    {book.quantity}
+                  </p>
+
+                  {/* 🧭 Actions */}
+                  <div className="flex gap-2 justify-center">
+                    <Link
+                      href={`/staff/books/${book.id}/edit`}
+                      className="px-3 py-1 border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-sm"
+                    >
+                      Edit Details
+                    </Link>
+
+                    <button
+                      onClick={() => handleDelete(book.id)}
+                      disabled={deletingId === book.id}
+                      className={`px-3 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-sm ${
+                        deletingId === book.id
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      {deletingId === book.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

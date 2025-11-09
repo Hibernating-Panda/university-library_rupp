@@ -14,7 +14,7 @@ export async function GET() {
   try {
     const books = await prisma.book.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, createdAt: true },
+      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, createdAt: true , quantity: true, category: true},
     });
     return json(books);
   } catch (e) {

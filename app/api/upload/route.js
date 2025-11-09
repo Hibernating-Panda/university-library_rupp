@@ -21,6 +21,8 @@ export async function POST(req) {
     const title = form.get("title");
     const author = form.get("author");
     const pdfFile = form.get("pdfFile");
+    const quantity = Number(form.get("quantity")) || 1;
+    const category = form.get("category");
 
     if (!title || !author || !pdfFile) {
       return json({ error: "Invalid request", message: "Missing title, author, or pdfFile" }, { status: 400 });
@@ -90,8 +92,10 @@ export async function POST(req) {
         author,
         fileUrl,
         coverImageUrl: coverImageUrl || null,
+        quantity,
+        category,
       },
-      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true },
+      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, quantity: true, category: true },
     });
 
     return json({ success: true, book }, { status: 201 });
@@ -100,7 +104,7 @@ export async function POST(req) {
     const message = e?.message || "Upload failed";
     return json({ error: "Upload failed", message }, { status: 500 });
   }
-}
+} 
 
 export async function GET() {
   return json({ error: "Method Not Allowed", message: "Use POST to upload a book" }, { status: 405 });
