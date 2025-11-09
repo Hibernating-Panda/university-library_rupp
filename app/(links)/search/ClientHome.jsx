@@ -49,9 +49,10 @@ export default function ClientHome({ user, initialBooks }) {
       <div className="flex-1 col-start-3 col-span-10 mt-20 px-6 py-4 z-20 bg-[#F3F3F7]">
 
         <main>
-          <div className="grid grid-cols-5 px-6 py-2 text-[#4D4D4D] font-semibold text-lg text-center">
-            <p className="text-left">Title</p>
-            <p></p>
+          <div className="grid grid-cols-6 px-6 py-2 text-[#4D4D4D] font-semibold text-lg text-center">
+            <p className="text-left">Cover</p>
+            <p>Title</p>
+            <p>Author</p>
             <p>Category</p>
             <p>Quantity</p>
             <p></p>
@@ -63,7 +64,7 @@ export default function ClientHome({ user, initialBooks }) {
               </div>
             ) : (
               books.map((book) => (
-                <div key={book.id} className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-5 items-center">
+                <div key={book.id} className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-6 items-center text-center">
                   <img
                     src={book.coverImageUrl || `/api/books/${book.id}/cover`}
                     alt={book.title}
@@ -71,8 +72,10 @@ export default function ClientHome({ user, initialBooks }) {
                   />
                   <div>
                     <h2 className="font-semibold mt-2 text-lg">{book.title}</h2>
+                    </div>
+                    <div>
                     <p className="text-sm text-gray-600">{book.author}</p>
-                  </div>
+                    </div>
                   <p className="text-sm text-gray-600 text-center">
                     {book.category || "Null"}
                   </p>
