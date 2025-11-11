@@ -1,9 +1,10 @@
 "use client";
+import Image from 'next/image';
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
 
-export default function ClientHome({ user, initialBooks }) {
+export default function ClientHome({ initialBooks }) {
   const [query, setQuery] = useState("");
 
   const books = useMemo(() => {
@@ -63,11 +64,9 @@ export default function ClientHome({ user, initialBooks }) {
                 {/* ✅ Cover + Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2 justify-center">
-                    <img
-                      src={book.coverImageUrl}
+                    <Image width={150} height={200} src={book.coverImageUrl}
                       alt={book.title}
-                      className="w-auto h-[200px] object-contain rounded-md"
-                    />
+                      className="w-auto h-[200px] object-contain rounded-md"/>
                     <p className="text-lg font-semibold text-[#4D4D4D]">
                       {book.title}
                     </p>

@@ -62,14 +62,17 @@ export default async function StaffReservations() {
     });
 
     // Create borrowing record (7 days)
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 7); // Add 7 days
+
     await prisma.borrowing.create({
       data: {
         bookId,
-        userId,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        status: "BORROWED",
-      },
-    });
+      userId,
+      dueDate,
+      status: "BORROWED",
+    },
+  });
 
     // Reduce quantity (atomic update)
     await prisma.book.update({

@@ -24,7 +24,7 @@ export async function POST(req) {
       select: { id: true, name: true, email: true, role: true },
     });
     return NextResponse.json(created, { status: 201 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

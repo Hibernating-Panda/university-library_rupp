@@ -24,9 +24,15 @@ export default function LoginPage() {
       redirect: true,
       callbackUrl: "/",
     });
+    interface SignInError {
+      error: string;
+      status: number;
+      ok: boolean;
+      url: string | null;
+    }
     // next-auth handles redirect; if it returns, it's likely an error in credentials
-    if (result && (result as any).error) {
-      setError((result as any).error || "Invalid credentials");
+    if (result && (result as SignInError).error) {
+      setError((result as SignInError).error || "Invalid credentials");
       setLoading(false);
     }
   }

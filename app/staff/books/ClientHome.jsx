@@ -1,14 +1,13 @@
 "use client";
+import Image from 'next/image';
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-export default function StaffBookManager({ user, initialBooks }) {
+export default function StaffBookManager({ initialBooks }) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState(initialBooks || []);
   const [deletingId, setDeletingId] = useState("");
-  const router = useRouter();
 
   // ✅ Search filter
   const filteredBooks = useMemo(() => {
@@ -92,8 +91,7 @@ export default function StaffBookManager({ user, initialBooks }) {
                   key={book.id}
                   className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-5 items-center"
                 >
-                  <img
-                    src={book.coverImageUrl || `/api/books/${book.id}/cover`}
+                  <Image width={150} height={200} src={book.coverImageUrl || `/api/books/${book.id}/cover`}
                     alt={book.title}
                     className="min-w-16 max-w-16 h-auto object-contain rounded"
                   />

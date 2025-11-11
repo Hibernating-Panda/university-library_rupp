@@ -9,7 +9,7 @@ export default function MenuBar() {
       <div className="flex flex-col gap-10 w-full">
         {/* Logo/Title */}
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Logo" width={50} height={50} />
+          <Image width={50} height={50} src="/logo.png" alt="Logo" />
           <p className="text-2xl font-bold text-[#FA7C54]">Library</p>
         </Link> 
   

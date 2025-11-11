@@ -3,11 +3,11 @@ import Image from "next/image";
 
 export default async function Home() {
   return (
-    <div className="flex-col min-h-screen w-full">
+    <div className="flex-col sticky w-full">
       <div className="w-full flex h-full bg-[#F3F3F7] rounded-t-2xl text-[#4D4D4D]">
         <div className="w-full items-center justify-between flex h-1/8 bg-white rounded-t-2xl px-5">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo" width={50} height={50} />
+            <Image width={50} height={50} src="/logo.png" alt="Logo" />
             <p className="text-2xl font-bold text-[#FA7C54]">Library</p>
           </Link> 
           <div className="flex items-center gap-3">

@@ -46,6 +46,7 @@ export default function EditBookPage() {
           author: book.author,
           category: book.category,
           quantity: book.quantity,
+          description: book.description,
         }), 
       });
 
@@ -136,8 +137,8 @@ export default function EditBookPage() {
 
         {/* TAB 1: Edit Details */}
         {activeTab === "details" && (
-          <form onSubmit={handleDetailUpdate} className="space-y-4">
-            <div>
+          <form onSubmit={handleDetailUpdate} className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Title
               </label>
@@ -150,7 +151,7 @@ export default function EditBookPage() {
               />
             </div>
 
-            <div>
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Author
               </label>
@@ -168,7 +169,7 @@ export default function EditBookPage() {
                 Category
               </label>
               <select
-                className="border p-2 w-full rounded text-black"
+                className="border px-2 pt-2 pb-3 w-full rounded text-black"
                 value={book.category || ""}
                 onChange={(e) => setBook({ ...book, category: e.target.value })}
               >
@@ -202,9 +203,20 @@ export default function EditBookPage() {
               />
             </div>
 
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                className="border p-2 w-full rounded text-black"
+                value={book.description || ""}
+                onChange={(e) => setBook({ ...book, description: e.target.value })}
+              />
+            </div>
+
             <button
               type="submit"
-              className="w-full py-2 bg-[#F76B56] text-white rounded-lg hover:bg-[#fa5d44]"
+              className="w-full py-2 bg-[#F76B56] text-white rounded-lg hover:bg-[#fa5d44] mt-4 col-span-2"
             >
               Save Changes
             </button>
@@ -229,14 +241,14 @@ export default function EditBookPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-black mb-1">
                 New PDF File
               </label>
               <input
                 type="file"
                 accept="application/pdf"
                 onChange={(e) => setPdf(e.target.files?.[0] || null)}
-                className="border p-2 w-full rounded"
+                className="text-black"
                 required
               />
             </div>
