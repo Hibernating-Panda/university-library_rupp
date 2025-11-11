@@ -94,7 +94,7 @@ export default function ClientHome({ initialBooks }) {
                             <span className="text-green-600 font-medium text-lg">Borrowed</span>
                           )}
                         </p>
-                        </div>
+                        </div> 
                         </div>
                       )}
                     </div>
