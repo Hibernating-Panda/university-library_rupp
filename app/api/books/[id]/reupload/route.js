@@ -1,47 +1,53 @@
+import { v2 as cloudinary } from "cloudinary";
 import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "/lib/authOptions";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+
+export const runtime = "nodejs";
+export const maxDuration = 30;
 
 export async function POST(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "STAFF") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { id } = params;
+    const formData = await req.formData();
+    const file = formData.get("file");
 
-    const form = await req.formData();
-    const pdfFile = form.get("pdfFile");
+    if (!file) return Response.json({ error: "No file provided" }, { status: 400 });
 
-    if (!pdfFile || !(pdfFile instanceof File)) {
-      return NextResponse.json({ error: "No valid file uploaded" }, { status: 400 });
-    }
+    const book = await prisma.book.findUnique({ where: { id } });
+    if (!book) return Response.json({ error: "Book not found" }, { status: 404 });
 
-    const bytes = await pdfFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // ✅ Read file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Ensure upload folder exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "books");
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = `/uploads/books/${params.id}.pdf`;
-    const fullPath = path.join(process.cwd(), "public", filePath);
-
-    await writeFile(fullPath, buffer);
-
-    const updated = await prisma.book.update({
-      where: { id: params.id },
-      data: { fileUrl: filePath },
+    // ✅ Upload NEW file to Cloudinary
+    const uploaded = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "library/books",
+          resource_type: "raw", // ✅ IMPORTANT for PDFs
+          public_id: `${book.slug}-${Date.now()}`,
+          overwrite: true
+        },
+        (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        }
+      ).end(buffer);
     });
 
-    return NextResponse.json({ success: true, book: updated });
+    // ✅ Delete old Cloudinary PDF (optional)
+    if (book.pdf_public_id) {
+      cloudinary.uploader.destroy(book.pdf_public_id, { resource_type: "raw" });
+    }
+
+    return Response.json({
+      message: "Book file reuploaded successfully!",
+      url: uploaded.secure_url
+    });
+    
+
   } catch (err) {
-    console.error("Reupload error:", err);
-    return NextResponse.json(
-      { error: "Reupload failed", details: err.message },
-      { status: 500 }
-    );
+    console.error(err);
+    return Response.json({ error: err.message }, { status: 500 });
   }
 }

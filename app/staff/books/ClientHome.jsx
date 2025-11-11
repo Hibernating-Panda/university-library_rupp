@@ -72,9 +72,10 @@ export default function StaffBookManager({ initialBooks }) {
       {/* 📚 Book Table */}
       <div className="flex-1 col-start-3 col-span-10 mt-20 px-6 py-4 z-20 bg-[#F3F3F7]">
         <main>
-          <div className="grid grid-cols-5 px-6 py-2 text-[#4D4D4D] font-semibold text-lg text-center">
-            <p className="text-left">Title</p>
-            <p></p>
+          <div className="grid grid-cols-6 px-6 py-2 text-[#4D4D4D] font-semibold text-lg text-center">
+            <p className="text-left">Cover</p>
+            <p>Title</p>
+            <p>Author</p>
             <p>Category</p>
             <p>Quantity</p>
             <p>Actions</p>
@@ -89,16 +90,19 @@ export default function StaffBookManager({ initialBooks }) {
               filteredBooks.map((book) => (
                 <div
                   key={book.id}
-                  className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-5 items-center"
+                  className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-6 items-center"
                 >
                   <Image width={150} height={200} src={book.coverImageUrl || `/api/books/${book.id}/cover`}
                     alt={book.title}
                     className="min-w-16 max-w-16 h-auto object-contain rounded"
                   />
-                  <div className="text-top">
-                    <h2 className="font-semibold mt-2 text-lg">{book.title}</h2>
-                    <p className="text-sm text-gray-600">{book.author}</p>
+                  <div className="">
+                    <h2 className="font-semibold mt-2 text-center">{book.title}</h2>
                   </div>
+                  <div>
+                    <p className="text-gray-600 text-center">{book.author}</p>
+                  </div>
+                  
                   <p className="text-sm text-gray-600 text-center">
                     {book.category || "Null"}
                   </p>
