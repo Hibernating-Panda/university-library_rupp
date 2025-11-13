@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import { useEffect, useState, useMemo } from "react";
 
 export default function UserRequests() {
@@ -7,29 +8,43 @@ export default function UserRequests() {
   const [query, setQuery] = useState("");
 
   const filteredRequests = useMemo(() => {
-  const q = query.toLowerCase();
-  return requests.filter((req) => {
-    const book = req.book;
-    return (
-      book.title.toLowerCase().includes(q) ||
-      book.author.toLowerCase().includes(q) ||
-      (book.category || "").toLowerCase().includes(q)
-    );
-  });
-}, [query, requests]);
-
-
-  const fetchRequests = async () => {
-    const res = await fetch("/api/user/requests");
-    const data = await res.json();
-    setRequests(data);
-    setLoading(false);
-  };
+    const q = query.toLowerCase();
+    return requests.filter((req) => {
+      const book = req.book;
+      return (
+        book.title.toLowerCase().includes(q) ||
+        book.author.toLowerCase().includes(q) ||
+        (book.category || "").toLowerCase().includes(q)
+      );
+    });
+  }, [query, requests]);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchRequests = async () => {
+      try {
+        const res = await fetch("/api/user/requests");
+        const data = await res.json();
+        if (isMounted) {
+          setRequests(data);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error("Error fetching requests:", error);
+          setLoading(false);
+        }
+      }
+    };
+
     fetchRequests();
-    const interval = setInterval(fetchRequests, 10000); // auto refresh
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchRequests, 10000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -98,11 +113,9 @@ export default function UserRequests() {
       key={req.id}
       className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-6 items-center text-center"
     >
-      <img
-        src={req.book.coverImageUrl || `/api/books/${req.book.id}/cover`}
+      <Image width={150} height={200} src={req.book.coverImageUrl || `/api/books/${req.book.id}/cover`}
         alt={req.book.title}
-        className="min-w-16 max-w-16 h-auto object-contain rounded"
-      />
+        className="min-w-16 max-w-16 h-auto object-contain rounded"/>
 
       <div>
         <h2 className="font-semibold mt-2 text-lg">{req.book.title}</h2>

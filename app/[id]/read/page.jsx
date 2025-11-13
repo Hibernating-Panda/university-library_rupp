@@ -10,13 +10,11 @@ export default async function BookReader({ params }) {
   if (!book) return <div>Book not found</div>;
 
   return (
-    <div className="p-8 min-h-screen bg-white text-black">
-      <h1 className="text-2xl font-bold mb-2">{book.title}</h1>
-      <p className="mb-4 text-gray-700">{book.author}</p>
+    <div className="min-h-screen w-full h-full bg-white text-black">
 
       <iframe
         src={`/api/books/${id}/file`}
-        className="w-full h-[80vh] border rounded"
+        className="w-full h-screen"
         title={book.title}
       />
     </div>

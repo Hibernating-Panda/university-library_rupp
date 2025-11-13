@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Calendar, ChevronDown, User } from "lucide-react";
+import { Clock, Calendar, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
@@ -74,10 +74,9 @@ export default function Navbar() {
             <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center">
               <User className="w-6 h-6 text-gray-600" />
             </div>
-            <span className="text-gray-700 font-medium">
+            <span className="text-gray-700 font-medium pr-3">
               {user?.name || "Guest"}
             </span>
-            <ChevronDown className="w-4 h-4 text-gray-500" />
           </div>
         </div>
       </div>

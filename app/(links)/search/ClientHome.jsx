@@ -1,9 +1,10 @@
 "use client";
+import Image from 'next/image';
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
 
-export default function ClientHome({ user, initialBooks }) {
+export default function ClientHome({ initialBooks }) {
   const [query, setQuery] = useState("");
 
   const books = useMemo(() => {
@@ -65,8 +66,7 @@ export default function ClientHome({ user, initialBooks }) {
             ) : (
               books.map((book) => (
                 <div key={book.id} className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-6 items-center text-center">
-                  <img
-                    src={book.coverImageUrl || `/api/books/${book.id}/cover`}
+                  <Image width={50} height={50} src={book.coverImageUrl || `/api/books/${book.id}/cover`}
                     alt={book.title}
                     className="min-w-16 max-w-16 h-auto object-contain rounded"
                   />

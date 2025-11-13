@@ -1,14 +1,14 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 
-export default function StaffBookManager({ user, initialBooks }) {
+export default function StaffBookManager({ initialBooks }) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState(initialBooks || []);
   const [deletingId, setDeletingId] = useState("");
-  const router = useRouter();
 
   // ✅ Search filter
   const filteredBooks = useMemo(() => {
@@ -30,7 +30,8 @@ export default function StaffBookManager({ user, initialBooks }) {
       const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
 
-      if (!res.ok) throw new Error(data?.error || data?.message || "Failed to delete");
+      if (!res.ok)
+        throw new Error(data?.error || data?.message || "Failed to delete");
       setBooks((prev) => prev.filter((b) => b.id !== id));
     } catch (e) {
       alert(e?.message || "Failed to delete");
@@ -92,15 +93,19 @@ export default function StaffBookManager({ user, initialBooks }) {
                   key={book.id}
                   className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-5 items-center"
                 >
-                  <img
+                  <Image
+                    width={150}
+                    height={200}
                     src={book.coverImageUrl || `/api/books/${book.id}/cover`}
                     alt={book.title}
                     className="min-w-16 max-w-16 h-auto object-contain rounded"
                   />
+
                   <div className="text-top">
                     <h2 className="font-semibold mt-2 text-lg">{book.title}</h2>
                     <p className="text-sm text-gray-600">{book.author}</p>
                   </div>
+
                   <p className="text-sm text-gray-600 text-center">
                     {book.category || "Null"}
                   </p>
@@ -109,24 +114,41 @@ export default function StaffBookManager({ user, initialBooks }) {
                   </p>
 
                   {/* 🧭 Actions */}
-                  <div className="flex gap-2 justify-center">
+                  <div className="flex gap-3 justify-center">
+                    {/* 👁️ View */}
                     <Link
-                      href={`/staff/books/${book.id}/edit`}
-                      className="px-3 py-1 border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-sm"
+                      href={`/staff/books/${book.id}/view`}
+                      className="text-gray-500 hover:text-gray-800"
+                      title="View Book"
                     >
-                      Edit Details
+                      <Eye size={20} />
                     </Link>
 
+                    {/* 🖊️ Edit */}
+                    <Link
+                      href={`/staff/books/${book.id}/edit`}
+                      className="text-blue-500 hover:text-blue-700"
+                      title="Edit Book"
+                    >
+                      <Pencil size={20} />
+                    </Link>
+
+                    {/* 🗑️ Delete */}
                     <button
                       onClick={() => handleDelete(book.id)}
                       disabled={deletingId === book.id}
-                      className={`px-3 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-sm ${
+                      className={`text-red-500 hover:text-red-700 ${
                         deletingId === book.id
                           ? "opacity-50 cursor-not-allowed"
                           : ""
                       }`}
+                      title="Delete Book"
                     >
-                      {deletingId === book.id ? "Deleting..." : "Delete"}
+                      {deletingId === book.id ? (
+                        <span className="text-sm">⏳</span>
+                      ) : (
+                        <Trash2 size={20} />
+                      )}
                     </button>
                   </div>
                 </div>

@@ -48,6 +48,7 @@ export async function PUT(req, { params }) {
         author: body.author,
         category: body.category,
         quantity: body.quantity,
+        description: body.description || "",
       },
     });
 
