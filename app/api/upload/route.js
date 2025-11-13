@@ -23,7 +23,6 @@ export async function POST(req) {
     const pdfFile = form.get("pdfFile");
     const quantity = Number(form.get("quantity")) || 1;
     const category = form.get("category");
-    const description = form.get("description");
 
     if (!title || !author || !pdfFile) {
       return json({ error: "Invalid request", message: "Missing title, author, or pdfFile" }, { status: 400 });
@@ -95,9 +94,8 @@ export async function POST(req) {
         coverImageUrl: coverImageUrl || null,
         quantity,
         category,
-        description,
       },
-      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, quantity: true, category: true, description: true },
+      select: { id: true, title: true, author: true, fileUrl: true, coverImageUrl: true, quantity: true, category: true },
     });
 
     return json({ success: true, book }, { status: 201 });

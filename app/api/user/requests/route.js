@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "/lib/authOptions";
+import { authOptions } from "@/lib/authOptions";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -8,12 +8,12 @@ export async function GET() {
 
   const requests = await prisma.reservation.findMany({
     where: {
-      user: { email: session.user.email }
+      user: { email: session.user.email },
     },
     include: {
-      book: true
+      book: true,
     },
-    orderBy: { reservedAt: "desc" }
+    orderBy: { reservedAt: "desc" },
   });
 
   return Response.json(requests);

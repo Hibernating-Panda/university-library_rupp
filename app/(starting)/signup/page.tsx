@@ -48,7 +48,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex items-center justify-center px-4 text-black w-full">
-      <form onSubmit={onSubmit} className="w-full max-w-lg space-y-4 border px-20 py-2 rounded-md bg-white">
+      <form onSubmit={onSubmit} className="w-full max-w-lg space-y-4 border-none px-20 py-2 rounded-md bg-white">
         <Image
           src="/logo.png"
           alt="Logo"

@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "/lib/authOptions";
+import { authOptions } from "@/lib/authOptions";
 import ClientHome from "./ClientHome";
 
 export default async function Home() {
@@ -14,9 +14,9 @@ export default async function Home() {
       author: true,
       coverImageUrl: true,
       quantity: true,
-      category: true
+      category: true,
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   return <ClientHome user={user} initialBooks={books} />;
