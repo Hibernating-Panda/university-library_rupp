@@ -34,7 +34,7 @@ export default function UploadBook() {
     formData.append("description", description);
     formData.append("pdfFile", pdf);
 
-    try {
+    try { 
       const res = await fetch("/api/upload", {   
         method: "POST",
         body: formData,

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "/lib/authOptions";
+import { authOptions } from "@/lib/authOptions";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -16,7 +16,10 @@ export async function POST(req, { params }) {
     const pdfFile = form.get("pdfFile");
 
     if (!pdfFile || !(pdfFile instanceof File)) {
-      return NextResponse.json({ error: "No valid file uploaded" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No valid file uploaded" },
+        { status: 400 }
+      );
     }
 
     const bytes = await pdfFile.arrayBuffer();
