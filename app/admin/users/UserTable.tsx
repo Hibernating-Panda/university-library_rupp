@@ -7,7 +7,7 @@ import { Users, X, Trash2, Eye, Edit3 } from "lucide-react";
 type Role = "ADMIN" | "STAFF" | "USER";
 
 interface User {
-  id: string;
+  id: string; 
   name: string;
   email: string;
   studentId: string;

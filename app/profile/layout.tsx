@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Menu_slide from "@/app/components/menu_slide/page";
-import Navbar from "@/app/components/staffnav/page";
+import Navbar from "@/app/components/navbar/page";
 
 export default function RootLayout({
   children,

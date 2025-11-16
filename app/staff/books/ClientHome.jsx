@@ -112,6 +112,11 @@ export default function StaffBookManager({ initialBooks }) {
 
                   {/* 🧭 Actions */}
                   <div className="flex gap-2 justify-center">
+
+                    <Link href={`/${book.id}/read`}
+                      className="px-3 py-1 border border-green-500 text-green-500 hover:bg-green-500 hover:text-white rounded-lg text-sm">
+                      View
+                    </Link>
                     <Link
                       href={`/staff/books/${book.id}/edit`}
                       className="px-3 py-1 border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-sm"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { User as UserIcon } from "lucide-react";
 import { BookOpen } from "lucide-react";
 
@@ -8,6 +9,7 @@ interface StaffType {
   id: number;
   name: string;
   email: string;
+  profile?: string;
 }
 
 export default function ClientHome() {
@@ -133,7 +135,18 @@ export default function ClientHome() {
             <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  <UserIcon className="w-4 h-4 text-gray-600" />
+                  {s.profile ? (
+                    <Image
+                      src={s.profile}
+                      alt="Profile"
+                      width={1000}
+                      height={1000}
+                      unoptimized
+                      className="max-w-8 max-h-8 rounded-full"
+                    />
+                  ) : (
+                    <UserIcon className="w-4 h-4 text-gray-600" />
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-800">{s.name}</p>

@@ -3,15 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import prisma from "@/lib/prisma";
 import { hash } from "bcryptjs";
-import formidable from "formidable";
-import fs from "fs";
-import path from "path";
 
 // Disable default body parser
 export const config = {
   api: {
     bodyParser: false,
-  },
+  }, 
 };
 
 export async function PUT(req, { params }) {
@@ -24,37 +21,17 @@ export async function PUT(req, { params }) {
   if (!id) return NextResponse.json({ error: "Missing user id" }, { status: 400 });
 
   try {
-    const form = new formidable.IncomingForm();
-    form.uploadDir = path.join(process.cwd(), "/public/images");
-    form.keepExtensions = true;
-
-    const data = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
-    });
-
-    const { fields, files } = data;
+    const body = await req.json();
 
     const updateData = {
-      name: fields.name,
-      email: fields.email,
-      studentId: fields.studentId,
-      role: fields.role,
+      name: body.name,
+      email: body.email,
+      studentId: body.studentId,
+      role: body.role,
     };
 
-    if (fields.password && fields.password.trim() !== "") {
-      updateData.password = await hash(fields.password, 10);
-    }
-
-    if (files.profile) {
-      const file = files.profile;
-      const fileName = `user-${id}${path.extname(file.originalFilename || "")}`;
-      const destPath = path.join(process.cwd(), "/public/images", fileName);
-
-      fs.renameSync(file.filepath, destPath);
-      updateData.profile = `/images/${fileName}`;
+    if (body.password && body.password.trim() !== "") {
+      updateData.password = await hash(body.password, 10);
     }
 
     const updatedUser = await prisma.user.update({
@@ -77,6 +54,7 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
   }
 }
+
 
 // ✅ DELETE handler (optional)
 export async function DELETE(req, { params }) {

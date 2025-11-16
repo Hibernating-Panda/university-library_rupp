@@ -48,6 +48,7 @@ interface StaffType {
   id: number;
   name: string;
   email: string;
+  profile?: string;
 }
 const [staff, setStaff] = useState<StaffType[]>([]);
 
@@ -150,8 +151,9 @@ useEffect(() => {
               <Image
               src={profileImage}
               alt="Profile"
-              width={100}
-              height={100}
+              width={1000}
+              height={1000}
+              unoptimized
               className="rounded-full border-2 border-orange-200 object-cover max-w-10 max-h-10"
             />
             </div>
@@ -308,7 +310,18 @@ useEffect(() => {
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                        <UserIcon className="w-4 h-4 text-gray-600" />
+                        {s.profile ? (
+                            <Image
+                                src={s.profile}
+                                alt="Profile"
+                                width={1000}
+                                height={1000}
+                                unoptimized
+                                className="max-w-8 max-h-8 rounded-full"
+                            />
+                        ) : (
+                            <UserIcon className="w-8 h-8 text-gray-600" />
+                        )}
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-800">{s.name}</p>

@@ -135,8 +135,10 @@ export default function ProfilePage() {
             <Image
               src={profileImage}
               alt="Profile"
-              fill
-              className="rounded-full border-4 border-orange-200 object-cover"
+              width={1000}
+              height={1000}
+              unoptimized
+              className="rounded-full border-4 border-orange-200 object-cover max-w-32 max-h-32"
             />
 
             {isEditing && (

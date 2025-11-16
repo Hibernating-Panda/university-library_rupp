@@ -20,25 +20,31 @@ export async function POST(req) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Ensure it is an image
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+    }
 
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Generate a unique filename
     const fileName = `${Date.now()}-${file.name}`;
-    const uploadPath = path.join(process.cwd(), "public/images/profiles", fileName);
+    const uploadDir = path.join(process.cwd(), "public/images/profiles");
 
     // Save file to /public/images/profiles
-    await writeFile(uploadPath, buffer);
+    await writeFile(path.join(uploadDir, fileName), buffer);
 
     // Public URL for frontend
     const url = `/images/profiles/${fileName}`;
 
-    // Update user in database
-    await prisma.user.update({
+    // Update user profile in database
+    const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: { profile: url },
+      select: { id: true, profile: true },
     });
 
-    return NextResponse.json({ url });
+    return NextResponse.json({ profile: updatedUser.profile });
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
     return NextResponse.json({ error: "Failed to upload" }, { status: 500 });
