@@ -20,8 +20,8 @@ export default function ClientHome({ initialBooks }) {
   return (
     <div className="min-h-screen w-full grid grid-cols-12 pr-5 bg-[#F3F3F7] absolute">
         {/* ✅ Search box */}
-        <div className="fixed top-8 left-70 w-full z-50 flex justify-start">
-            <div className="ml-5 mt-3 w-1/4">
+        <div className="fixed top-8 ml-70 z-50">
+            <div className="ml-5 mt-3 w-full">
                 <div className="flex items-center w-full bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="flex items-center justify-between w-full px-4 py-2 text-[#F76B56]">
                     <input

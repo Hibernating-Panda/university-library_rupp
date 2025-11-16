@@ -1,17 +1,21 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 import Image from 'next/image';
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import UserTable from "./UserTable";
+import SidebarProfile from "@/app/components/sidebarprofile";
 import { 
   LayoutDashboard,
   Users,
   LogOut,
-  User as UserIcon,
   Clock,
   Calendar
 } from "lucide-react";
 
 export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+  const admin = session?.user;
   const now = new Date();
   const hour = now.getHours();
   const minutes = now.getMinutes().toString().padStart(2, "0");
@@ -25,7 +29,7 @@ export default async function AdminPage() {
   // ✅ Server-side Prisma fetch
   const users = await prisma.user.findMany({
     where: { role: { not: "ADMIN" }},
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, studentId: true, createdAt: true },
     orderBy: { createdAt: "desc" }
   });
 
@@ -34,7 +38,9 @@ export default async function AdminPage() {
   name: string | null;
   email: string;
   role: string;
+  studentId: string;
   createdAt: Date;
+  profile: string | null;
 };
 
   return (
@@ -57,11 +63,11 @@ export default async function AdminPage() {
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-3xl p-1 flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-                <UserIcon className="w-5 h-5" />
+              <div className="max-w-10 max-h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                <SidebarProfile />
               </div>
               <div>
-                <span className="font-medium">Admin</span>
+                <span className="font-medium">{admin?.name || "Admin"}</span>
                 <p className="text-sm text-gray-400">Admin</p>
               </div>
             </div>

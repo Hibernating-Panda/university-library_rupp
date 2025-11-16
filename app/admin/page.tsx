@@ -20,6 +20,7 @@ const pathname = usePathname();
 const [currentTime, setCurrentTime] = useState("");
 const [currentDate, setCurrentDate] = useState("");
 const { data: session } = useSession();
+const [profileImage, setProfileImage] = useState("/default-avatar.png");
 const [totalUsers, setTotalUsers] = useState(0);
 const [totalBooks, setTotalBooks] = useState(0);
 const [bookStatus, setBookStatus] = useState({
@@ -28,13 +29,28 @@ const [bookStatus, setBookStatus] = useState({
   available: 0
 });
 
+// Load profile data on component mount
+useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      const res = await fetch("/api/user/profile");
+      const data = await res.json();
+      setProfileImage(data.profile || "/default-avatar.png");
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+    }
+  };
+
+  loadProfile();
+}, []);
+
 interface StaffType {
   id: number;
   name: string;
   email: string;
 }
-
 const [staff, setStaff] = useState<StaffType[]>([]);
+
 
 useEffect(() => {
   fetch("/api/user/total_user")
@@ -129,9 +145,15 @@ useEffect(() => {
         {/* User Profile */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="rounded-3xl shadow-sm p-1 flex items-center gap-3">
+            <Link href="/admin/profile" className="rounded-3xl shadow-sm p-1 flex items-center gap-3 cursor-pointer">
             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-              <UserIcon className="w-5 h-5 " />
+              <Image
+              src={profileImage}
+              alt="Profile"
+              width={100}
+              height={100}
+              className="rounded-full border-2 border-orange-200 object-cover max-w-10 max-h-10"
+            />
             </div>
             <div>
                 <span className="font-medium">
@@ -139,7 +161,7 @@ useEffect(() => {
                 </span>
                 <p className="text-sm text-gray-400">Admin</p>
             </div>
-            </div>
+            </Link>
           </div>
         </div>
 

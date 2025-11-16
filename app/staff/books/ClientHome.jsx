@@ -41,10 +41,10 @@ export default function StaffBookManager({ initialBooks }) {
   return (
     <div className="min-h-screen w-full grid grid-cols-12 pr-5 bg-[#F3F3F7] absolute">
       {/* 🔍 Search box */}
-      <div className="fixed top-8 left-70 w-full z-50 flex justify-start">
-        <div className="ml-5 mt-3 w-1/4">
+      <div className="fixed top-8 ml-70 z-50">
+        <div className="ml-5 mt-3 w-full">
           <div className="flex items-center w-full bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="flex justify-between w-full px-4 py-2 text-[#F76B56]">
+            <div className="flex justify-between w-full px-4 py-2 text-[#F76B56] items-center">
               <input
                 type="text"
                 placeholder="Search"
@@ -116,13 +116,13 @@ export default function StaffBookManager({ initialBooks }) {
                       href={`/staff/books/${book.id}/edit`}
                       className="px-3 py-1 border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg text-sm"
                     >
-                      Edit Details
+                      Edit
                     </Link>
 
                     <button
                       onClick={() => handleDelete(book.id)}
                       disabled={deletingId === book.id}
-                      className={`px-3 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-sm ${
+                      className={`px-3 py-1 border border-red-500 text-red-500 cursor-pointer hover:bg-red-500 hover:text-white rounded-lg text-sm ${
                         deletingId === book.id
                           ? "opacity-50 cursor-not-allowed"
                           : ""

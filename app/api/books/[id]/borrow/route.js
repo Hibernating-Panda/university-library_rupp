@@ -1,13 +1,13 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "/lib/authOptions";
+import { authOptions } from "@/lib/authOptions";
 import { NextResponse } from "next/server";
 
 export async function POST(req, { params }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email)
-    return NextResponse.json({ error: "Not Logged In" }, { status: 401 });
+    return NextResponse.json({ success: false, msg: "Not Logged In" }, { status: 401 });
 
   const bookId = params.id;
   const userEmail = session.user.email;
@@ -19,7 +19,7 @@ export async function POST(req, { params }) {
     });
 
     if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 400 });
+      return NextResponse.json({ success: false, msg: "User not found" }, { status: 400 });
 
     await prisma.reservation.create({
       data: {
@@ -31,11 +31,11 @@ export async function POST(req, { params }) {
       },
     });
 
-    // ✅ Correct redirect
-    return NextResponse.redirect(new URL("/", req.url));
+    // ⬇️ return success and stay on same page
+    return NextResponse.json({ success: true, msg: "Borrow Requested" });
   } catch (err) {
     return NextResponse.json(
-      { error: "Failed to request borrow", details: err.message },
+      { success: false, msg: "Failed to request borrow", details: err.message },
       { status: 500 }
     );
   }

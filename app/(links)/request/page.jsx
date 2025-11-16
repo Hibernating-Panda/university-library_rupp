@@ -47,12 +47,37 @@ export default function UserRequests() {
     };
   }, []);
 
+  async function handleCancelRequest(id, status) {
+  if (status !== "PENDING") {
+    alert("Only pending requests can be cancelled.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/user/requests/cancel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    if (!res.ok) throw new Error("Failed to cancel request");
+
+    // Update local state
+    setRequests(prev =>
+      prev.map(r => (r.id === id ? { ...r, status: "CANCELLED" } : r))
+    );
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to cancel request");
+  }
+}
+
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="min-h-screen w-full grid grid-cols-12 pr-5 absolute text-black">
-        <div className="fixed top-8 left-70 w-full z-50 flex justify-start">
-            <div className="ml-5 mt-3 w-1/4">
+        <div className="fixed top-8 ml-70 z-50">
+            <div className="ml-5 mt-3 w-full">
                 <div className="flex items-center w-full bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="flex items-center justify-between w-full px-4 py-2 text-[#F76B56]">
                     <input
@@ -81,13 +106,14 @@ export default function UserRequests() {
       <div className="col-start-3 col-span-10 z-20 mt-20 pt-10 px-10 bg-[#F3F3F7]">
     <div className="w-full p-4">
       <h1 className="text-xl font-semibold mb-4 text-[#F76B56]">Borrow Requests</h1>
-      <div className="grid grid-cols-6 px-6 text-[#4D4D4D] font-semibold text-lg text-center">
+      <div className="grid grid-cols-7 px-6 text-[#4D4D4D] font-semibold text-lg text-center">
             <p className="text-left">Cover</p>
             <p>Title</p>
             <p>Author</p>
             <p>Category</p>
             <p>Status</p>
             <p>Requested Date</p>
+            <p></p>
           </div>
 
       {filteredRequests.map((req) => {
@@ -111,7 +137,7 @@ export default function UserRequests() {
         return (
           <div
       key={req.id}
-      className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-6 items-center text-center"
+      className="mt-5 px-5 py-2 rounded-2xl bg-white grid grid-cols-7 items-center text-center"
     >
       <Image width={150} height={200} src={req.book.coverImageUrl || `/api/books/${req.book.id}/cover`}
         alt={req.book.title}
@@ -135,6 +161,14 @@ export default function UserRequests() {
       <p className="text-sm text-gray-500">
         {new Date(req.reservedAt).toLocaleDateString()}
       </p>
+      {req.status === 'PENDING' && (
+        <p className="text-sm text-red-600 cursor-pointer hover:opacity-80"
+          onClick={() => handleCancelRequest(req.id, req.status)}
+        >
+          Cancel
+        </p>
+      )}
+
     </div>
         );
       })}

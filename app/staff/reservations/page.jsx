@@ -15,14 +15,12 @@ export default async function StaffReservations() {
   async function accept(id, bookId, userId) {
     "use server";
 
-    // Re-read current book quantity
     const book = await prisma.book.findUnique({
       where: { id: bookId },
       select: { quantity: true, status: true },
     });
 
     if (!book) {
-      // mark reservation cancelled if book not found
       await prisma.reservation.update({
         where: { id },
         data: { status: "CANCELLED" },
@@ -38,7 +36,6 @@ export default async function StaffReservations() {
     }
 
     if (book.quantity <= 0) {
-      // no copies available -> cancel reservation
       await prisma.reservation.update({
         where: { id },
         data: { status: "CANCELLED" },
@@ -55,36 +52,31 @@ export default async function StaffReservations() {
       return;
     }
 
-    // Approve (fulfill) reservation
     await prisma.reservation.update({
       where: { id },
-      data: { status: "FULFILLED" }, // <-- use enum value
+      data: { status: "FULFILLED" },
     });
 
-    // Create borrowing record (7 days)
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 7); // Add 7 days
+    dueDate.setDate(dueDate.getDate() + 7);
 
     await prisma.borrowing.create({
       data: {
         bookId,
-      userId,
-      dueDate,
-      status: "BORROWED",
-    },
-  });
+        userId,
+        dueDate,
+        status: "BORROWED",
+      },
+    });
 
-    // Reduce quantity (atomic update)
     await prisma.book.update({
       where: { id: bookId },
       data: {
         quantity: { decrement: 1 },
-        // Optionally update book status if none left
         ...(book.quantity - 1 <= 0 ? { status: "BORROWED" } : {}),
       },
     });
 
-    // Notify user (use SYSTEM since NotificationType doesn't have BORROW_ACCEPTED)
     await prisma.notification.create({
       data: {
         userId,
@@ -99,7 +91,7 @@ export default async function StaffReservations() {
 
     await prisma.reservation.update({
       where: { id },
-      data: { status: "CANCELLED" }, // <-- use enum value
+      data: { status: "CANCELLED" },
     });
 
     await prisma.notification.create({
@@ -110,43 +102,69 @@ export default async function StaffReservations() {
       },
     });
   }
- 
+
   return (
     <div className="min-h-screen w-full grid grid-cols-12 pr-5 absolute">
       <div className="col-start-3 col-span-10 z-20 pt-30 px-20 bg-[#F3F3F7]">
-    <div className="p-6 text-black bg-white rounded-lg">
-      <h1 className="text-xl font-bold mb-4">Borrow Requests</h1>
-      <table className="w-full border">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border p-2">Book</th>
-            <th className="border p-2">User</th>
-            <th className="border p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reservations.map((r) => (
-            <tr key={r.id}>
-              <td className="border p-2">
-                {r.book.title} ({r.book.quantity} left)
-              </td>
-              <td className="border p-2">
-                {r.user.name} — {r.user.email}
-              </td>
-              <td className="border p-2 space-x-2">
-                <form action={accept.bind(null, r.id, r.bookId, r.userId)}>
-                  <button className="bg-green-600 text-white px-2 py-1 rounded">Accept</button>
-                </form>
-                <form action={reject.bind(null, r.id, r.userId)}>
-                  <button className="bg-red-600 text-white px-2 py-1 rounded">Reject</button>
-                </form>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    </div>
+        <div className="p-6 text-black bg-white rounded-lg">
+          <h1 className="text-2xl font-semibold mb-6 text-gray-800">Borrow Requests</h1>
+
+          <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+            <table className="w-full text-sm text-gray-700">
+              <thead className="bg-gray-50 border-b text-gray-600">
+                <tr>
+                  <th className="p-3 text-left font-semibold">Book</th>
+                  <th className="p-3 text-left font-semibold">User</th>
+                  <th className="p-3 text-center font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((r, index) => (
+                  <tr
+                    key={r.id}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition`}
+                  >
+                    <td className="p-3">
+                      <span className="font-medium">{r.book.title}</span>{" "}
+                      <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">
+                        {r.book.quantity} left
+                      </span>
+                    </td>
+
+                    <td className="p-3">
+                      {r.user.name}{" "}
+                      <span className="text-xs text-gray-500">({r.user.email})</span>
+                    </td>
+
+                    <td className="p-3 text-center space-x-2">
+                      <form action={accept.bind(null, r.id, r.bookId, r.userId)} className="inline-block">
+                        <button className="px-3 py-1 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer">
+                          Accept
+                        </button>
+                      </form>
+
+                      <form action={reject.bind(null, r.id, r.userId)} className="inline-block">
+                        <button className="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition cursor-pointer">
+                          Reject
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+
+                {reservations.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="p-4 text-center text-gray-500">
+                      No pending requests
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

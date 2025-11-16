@@ -3,7 +3,6 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Eye, EyeOff} from "lucide-react";
-import Link from "next/link";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -74,9 +73,6 @@ export default function LoginPage() {
         <button disabled={loading} className="w-full px-4 py-2 rounded-md bg-[#FA7C54] text-white disabled:opacity-60 hover:opacity-80 hover:cursor-pointer mt-4">
           {loading ? "Logging in..." : "Log in"}
         </button>
-        <p className="text-sm text-gray-500">
-          New User? <Link href="/signup" className="text-[#FA7C54] hover:opacity-80 underline">Register Here</Link>
-        </p>
       </form>
     </div>
   );

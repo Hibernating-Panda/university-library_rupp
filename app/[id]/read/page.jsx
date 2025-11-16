@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function BookReader({ params }) {
   const { id } = await params;
@@ -17,6 +18,12 @@ export default async function BookReader({ params }) {
         className="w-full h-screen"
         title={book.title}
       />
+      <Link
+        href={`/${id}`}
+        className="fixed top-15 right-10 bg-[#F3F3F7] text-black px-4 py-2 rounded-lg hover:bg-[#F3F3F7]"
+      >
+        Back
+      </Link>
     </div>
   );
 }

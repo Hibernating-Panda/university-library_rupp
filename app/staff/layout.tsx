@@ -1,5 +1,5 @@
 import StaffMenu from "@/app/components/staff_menu/page";
-import Navbar from "@/app/components/navbar/page";
+import StaffNavbar from "@/app/components/staffnav/page";
 
 export default function RootLayout({
   children,
@@ -16,7 +16,7 @@ export default function RootLayout({
 
   {/* Navbar & Menu */}
   <div className="relative">
-    <Navbar />
+    <StaffNavbar />
     <StaffMenu />
   </div>
 

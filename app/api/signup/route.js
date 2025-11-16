@@ -5,7 +5,7 @@ import { hashPassword } from "@/lib/auth";
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = body || {};
+    const { name, email, password, role, studentId } = body || {};
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
@@ -20,8 +20,9 @@ export async function POST(req) {
         email,
         password: hashed,
         role: role && ["ADMIN","STAFF","USER"].includes(role) ? role : "USER",
+        studentId,
       },
-      select: { id: true, name: true, email: true, role: true },
+      select: { id: true, name: true, email: true, role: true, studentId: true },
     });
     return NextResponse.json(created, { status: 201 });
   } catch {

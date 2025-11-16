@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
+    "bcryptjs": "^3.0.3",
     "busboy": "^1.6.0",
     "cloudinary": "^2.8.0",
     "formidable": "^3.5.4",

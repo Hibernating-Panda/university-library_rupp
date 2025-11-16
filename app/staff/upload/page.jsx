@@ -165,7 +165,7 @@ export default function UploadBook() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 px-4 rounded text-white font-medium ${
+            className={`w-full py-2 px-4 rounded text-white font-medium cursor-pointer ${
               loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
